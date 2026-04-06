@@ -570,9 +570,29 @@ function renderBoard(board, tribes) {
 
             // Resource/Building
             if (tile.resource) {
-                drawLabel(ctx, x, y, tile.resource, tileSize, '#ffffff', 10);
+                const resourceImg = getResourceImage(tile.resource);
+                if (resourceImg) {
+                    // Draw resource sprite at top of tile
+                    const iconSize = tileSize * 0.4;
+                    ctx.drawImage(resourceImg, x * tileSize + 4, y * tileSize + 2, iconSize, iconSize);
+                } else {
+                    drawLabel(ctx, x, y, tile.resource, tileSize, '#ffffff', 10);
+                }
             } else if (tile.building) {
-                drawLabel(ctx, x, y, tile.building.substring(0, 3), tileSize, '#000000', 10);
+                const buildingImg = getBuildingImage(tile.building);
+                if (buildingImg) {
+                    // Draw building sprite centered on tile
+                    const buildingSize = tileSize * 0.6;
+                    ctx.drawImage(
+                        buildingImg,
+                        x * tileSize + (tileSize - buildingSize) / 2,
+                        y * tileSize + (tileSize - buildingSize) / 2,
+                        buildingSize,
+                        buildingSize
+                    );
+                } else {
+                    drawLabel(ctx, x, y, tile.building.substring(0, 3), tileSize, '#000000', 10);
+                }
             }
 
             // City overlay
@@ -602,30 +622,55 @@ function drawUnit(ctx, x, y, unit, tileSize) {
     const centerY = y * tileSize + tileSize / 2;
     const radius = 14;
 
-    // Unit circle
-    ctx.fillStyle = TRIBE_COLORS[unit.tribe_id] || '#888';
-    ctx.beginPath();
-    ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
-    ctx.fill();
+    // Try to get unit sprite
+    const exhausted = unit.current_hp < unit.max_hp; // Approximate exhausted status
+    const unitImg = getUnitImage(unit.type, unit.tribe_id, exhausted);
 
-    // Veteran ring
-    if (unit.is_veteran) {
-        ctx.strokeStyle = '#ffd700';
-        ctx.lineWidth = 2;
+    if (unitImg) {
+        // Draw sprite centered
+        const spriteSize = tileSize * 0.8; // Slightly smaller than tile
+        ctx.drawImage(
+            unitImg,
+            centerX - spriteSize / 2,
+            centerY - spriteSize / 2,
+            spriteSize,
+            spriteSize
+        );
+
+        // Veteran ring around sprite
+        if (unit.is_veteran) {
+            ctx.strokeStyle = '#ffd700';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, spriteSize / 2 + 2, 0, Math.PI * 2);
+            ctx.stroke();
+        }
+    } else {
+        // Fallback: Unit circle
+        ctx.fillStyle = TRIBE_COLORS[unit.tribe_id] || '#888';
         ctx.beginPath();
         ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
-        ctx.stroke();
+        ctx.fill();
+
+        // Veteran ring
+        if (unit.is_veteran) {
+            ctx.strokeStyle = '#ffd700';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
+            ctx.stroke();
+        }
+
+        // Unit type label
+        const label = UNIT_LABELS[unit.type] || unit.type.slice(0, 2);
+        ctx.fillStyle = '#ffffff';
+        ctx.font = 'bold 9px monospace';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(label, centerX, centerY);
     }
 
-    // Unit type label
-    const label = UNIT_LABELS[unit.type] || unit.type.slice(0, 2);
-    ctx.fillStyle = '#ffffff';
-    ctx.font = 'bold 9px monospace';
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    ctx.fillText(label, centerX, centerY);
-
-    // HP bar
+    // HP bar (always show)
     const barWidth = 30;
     const barHeight = 4;
     const hpRatio = unit.hp / unit.max_hp;
