@@ -554,8 +554,14 @@ function renderBoard(board, tribes) {
             const tile = board[y][x];
 
             // Terrain background
-            ctx.fillStyle = TERRAIN_COLORS[tile.terrain] || TERRAIN_COLORS['PLAIN'];
-            ctx.fillRect(x * tileSize, y * tileSize, tileSize, tileSize);
+            const terrainImg = getTerrainImage(tile.terrain);
+            if (terrainImg) {
+                ctx.drawImage(terrainImg, x * tileSize, y * tileSize, tileSize, tileSize);
+            } else {
+                // Fallback to colored rectangle
+                ctx.fillStyle = TERRAIN_COLORS[tile.terrain] || TERRAIN_COLORS['PLAIN'];
+                ctx.fillRect(x * tileSize, y * tileSize, tileSize, tileSize);
+            }
 
             // Grid lines
             ctx.strokeStyle = 'rgba(0, 0, 0, 0.2)';
