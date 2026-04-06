@@ -6,6 +6,290 @@ const PLAYER_TYPES = ['HUMAN', 'RANDOM', 'MCTS', 'RHEA', 'OSLA', 'MC', 'OEP', 'E
 // Names must match Java Types.TRIBE getName() or name() after normalization
 const TRIBES = ['Xin-Xi', 'Imperius', 'Bardur', 'Oumaji', 'Kickoo', 'Hoodrick', 'Luxidoor', 'Vengir', 'Zebasi', 'Ai-Mo', 'Quetzali', 'Yadakk'];
 
+// ============================================
+// IMAGE LOADING SYSTEM
+// ============================================
+
+const imageCache = {};
+let imagesLoaded = false;
+
+// Terrain image paths
+const TERRAIN_IMAGES = {
+    'PLAIN':         '/img/terrain/plain.png',
+    'SHALLOW_WATER': '/img/terrain/water.png',
+    'DEEP_WATER':    '/img/terrain/deepwater.png',
+    'MOUNTAIN':      '/img/terrain/mountain3.png',
+    'VILLAGE':       '/img/terrain/village2.png',
+    'CITY':          '/img/terrain/city3.png',
+    'FOREST':        '/img/terrain/forest2.png',
+};
+
+// Unit types (must match game data)
+const UNIT_TYPES = [
+    'warrior', 'archer', 'rider', 'swordsman', 'catapult', 'knight',
+    'defender', 'mind_bender', 'boat', 'ship', 'battleship', 'superunit'
+];
+
+// Number of tribes (0-11)
+const NUM_TRIBES = 12;
+
+// Building image paths
+const BUILDING_IMAGES = {
+    'DOCK':         '/img/building/dock2.png',
+    'MINE':         '/img/building/mine2.png',
+    'FORGE':        '/img/building/forge2.png',
+    'FARM':         '/img/building/farm2.png',
+    'WINDMILL':     '/img/building/windmill2.png',
+    'CUSTOM_HOUSE': '/img/building/custom_house2.png',
+    'LUMBER_HUT':   '/img/building/lumber_hut2.png',
+    'SAWMILL':      '/img/building/sawmill2.png',
+    'TEMPLE':       '/img/building/temple2.png',
+    'MONUMENT':     '/img/building/monument2.png',
+};
+
+// Resource image paths
+const RESOURCE_IMAGES = {
+    'FISH':   '/img/resource/fish2.png',
+    'FRUIT':  '/img/resource/fruit2.png',
+    'ANIMAL': '/img/resource/animal2.png',
+    'WHALE':  '/img/resource/whale2.png',
+    'ORE':    '/img/resource/ore2.png',
+    'CROPS':  '/img/resource/crops2.png',
+    'RUINS':  '/img/resource/ruins2.png',
+};
+
+/**
+ * Generate unit image path for a specific unit type and tribe
+ * @param {string} unitType - Unit type (e.g., 'warrior', 'archer')
+ * @param {number} tribeId - Tribe ID (0-11)
+ * @param {boolean} exhausted - Whether the unit is exhausted
+ * @returns {string} Image path
+ */
+function getUnitImagePath(unitType, tribeId, exhausted = false) {
+    const suffix = exhausted ? 'Exhausted' : '';
+    return `/img/unit/${unitType}/${tribeId}${suffix}.png`;
+}
+
+/**
+ * Get all image paths that need to be preloaded
+ * @returns {string[]} Array of image paths
+ */
+function getAllImagePaths() {
+    const paths = [];
+
+    // Terrain images
+    Object.values(TERRAIN_IMAGES).forEach(path => paths.push(path));
+
+    // Building images
+    Object.values(BUILDING_IMAGES).forEach(path => paths.push(path));
+
+    // Resource images
+    Object.values(RESOURCE_IMAGES).forEach(path => paths.push(path));
+
+    // Unit images (all types × all tribes × normal/exhausted)
+    UNIT_TYPES.forEach(unitType => {
+        for (let tribeId = 0; tribeId < NUM_TRIBES; tribeId++) {
+            paths.push(getUnitImagePath(unitType, tribeId, false));
+            paths.push(getUnitImagePath(unitType, tribeId, true));
+        }
+    });
+
+    return paths;
+}
+
+/**
+ * Show loading progress UI
+ * @param {number} loaded - Number of images loaded
+ * @param {number} total - Total number of images
+ */
+function showLoadingProgress(loaded, total) {
+    let overlay = document.getElementById('loading-overlay');
+    
+    if (!overlay) {
+        overlay = document.createElement('div');
+        overlay.id = 'loading-overlay';
+        overlay.innerHTML = `
+            <div class="loading-content">
+                <div class="loading-title">LOADING ASSETS</div>
+                <div class="loading-bar-container">
+                    <div class="loading-bar" id="loading-bar"></div>
+                </div>
+                <div class="loading-text" id="loading-text">0 / 0</div>
+            </div>
+        `;
+        overlay.style.cssText = `
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(10, 15, 25, 0.95);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+        `;
+        const contentStyle = `
+            text-align: center;
+            color: #00ff88;
+            font-family: 'Courier New', monospace;
+        `;
+        const barContainerStyle = `
+            width: 300px;
+            height: 20px;
+            background: #1a1a2e;
+            border: 1px solid #00ff88;
+            margin: 20px 0;
+            overflow: hidden;
+        `;
+        const barStyle = `
+            height: 100%;
+            background: linear-gradient(90deg, #00ff88, #00cc6a);
+            width: 0%;
+            transition: width 0.1s ease-out;
+        `;
+        document.body.appendChild(overlay);
+        
+        overlay.querySelector('.loading-content').style.cssText = contentStyle;
+        overlay.querySelector('.loading-bar-container').style.cssText = barContainerStyle;
+        overlay.querySelector('.loading-bar').style.cssText = barStyle;
+    }
+
+    const percent = total > 0 ? Math.round((loaded / total) * 100) : 0;
+    const bar = document.getElementById('loading-bar');
+    const text = document.getElementById('loading-text');
+    
+    if (bar) bar.style.width = `${percent}%`;
+    if (text) text.textContent = `${loaded} / ${total}`;
+}
+
+/**
+ * Hide loading progress UI
+ */
+function hideLoadingProgress() {
+    const overlay = document.getElementById('loading-overlay');
+    if (overlay) {
+        overlay.remove();
+    }
+}
+
+/**
+ * Preload all game images
+ * @returns {Promise} Resolves when all images are loaded
+ */
+function preloadImages() {
+    return new Promise((resolve, reject) => {
+        const allPaths = getAllImagePaths();
+        let loaded = 0;
+        let failed = 0;
+        const failedPaths = [];
+
+        if (allPaths.length === 0) {
+            imagesLoaded = true;
+            resolve();
+            return;
+        }
+
+        showLoadingProgress(0, allPaths.length);
+
+        allPaths.forEach(path => {
+            const img = new Image();
+            
+            img.onload = () => {
+                imageCache[path] = img;
+                loaded++;
+                showLoadingProgress(loaded + failed, allPaths.length);
+                
+                if (loaded + failed === allPaths.length) {
+                    imagesLoaded = true;
+                    hideLoadingProgress();
+                    if (failedPaths.length > 0) {
+                        console.warn('Some images failed to load:', failedPaths);
+                    }
+                    resolve();
+                }
+            };
+
+            img.onerror = () => {
+                failed++;
+                failedPaths.push(path);
+                console.warn(`Failed to load image: ${path}`);
+                showLoadingProgress(loaded + failed, allPaths.length);
+                
+                if (loaded + failed === allPaths.length) {
+                    imagesLoaded = true;
+                    hideLoadingProgress();
+                    // Resolve anyway - we'll fall back to colored shapes for missing images
+                    resolve();
+                }
+            };
+
+            img.src = path;
+        });
+    });
+}
+
+/**
+ * Get a cached image by path
+ * @param {string} path - Image path
+ * @returns {HTMLImageElement|null} Cached image or null if not loaded
+ */
+function getImage(path) {
+    return imageCache[path] || null;
+}
+
+/**
+ * Get terrain image for a terrain type
+ * @param {string} terrainType - Terrain type (e.g., 'PLAIN', 'MOUNTAIN')
+ * @returns {HTMLImageElement|null} Cached image or null
+ */
+function getTerrainImage(terrainType) {
+    const path = TERRAIN_IMAGES[terrainType];
+    return path ? getImage(path) : null;
+}
+
+/**
+ * Get building image for a building type
+ * @param {string} buildingType - Building type (e.g., 'FARM', 'MINE')
+ * @returns {HTMLImageElement|null} Cached image or null
+ */
+function getBuildingImage(buildingType) {
+    const path = BUILDING_IMAGES[buildingType];
+    return path ? getImage(path) : null;
+}
+
+/**
+ * Get resource image for a resource type
+ * @param {string} resourceType - Resource type (e.g., 'FISH', 'FRUIT')
+ * @returns {HTMLImageElement|null} Cached image or null
+ */
+function getResourceImage(resourceType) {
+    const path = RESOURCE_IMAGES[resourceType];
+    return path ? getImage(path) : null;
+}
+
+/**
+ * Get unit image for a specific unit type and tribe
+ * @param {string} unitType - Unit type in game format (e.g., 'WARRIOR', 'ARCHER')
+ * @param {number} tribeId - Tribe ID (0-11)
+ * @param {boolean} exhausted - Whether the unit is exhausted
+ * @returns {HTMLImageElement|null} Cached image or null
+ */
+function getUnitImage(unitType, tribeId, exhausted = false) {
+    // Convert game unit type to image path format
+    const unitTypeLower = unitType.toLowerCase().replace('mindbender', 'mind_bender');
+    const path = getUnitImagePath(unitTypeLower, tribeId, exhausted);
+    return getImage(path);
+}
+
+/**
+ * Check if all images have been loaded
+ * @returns {boolean} True if images are loaded
+ */
+function areImagesLoaded() {
+    return imagesLoaded;
+}
+
 const TERRAIN_COLORS = {
     'PLAIN':        '#c8b96e',
     'MOUNTAIN':     '#8a8a8a',
@@ -412,4 +696,14 @@ document.getElementById('new-game-btn').addEventListener('click', async () => {
 // INITIALIZATION
 // ============================================
 
-document.addEventListener('DOMContentLoaded', initSetup);
+document.addEventListener('DOMContentLoaded', async () => {
+    // Preload images before showing setup
+    try {
+        await preloadImages();
+        console.log('Images preloaded successfully');
+    } catch (error) {
+        console.error('Error preloading images:', error);
+    }
+    
+    initSetup();
+});
