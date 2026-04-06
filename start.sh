@@ -6,4 +6,4 @@ javac -cp lib/json.jar -sourcepath src -d out \
 
 echo "=== Starting server on :8000 ==="
 echo "In VS Code: open the Ports panel and forward port 8000, then open the browser URL."
-uv run uvicorn main:app --host 0.0.0.0 --port 8000 --reload
+uv run uvicorn tribes_py.web.main:app --host 0.0.0.0 --port 8000 --reload

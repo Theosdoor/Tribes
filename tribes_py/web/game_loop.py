@@ -1,6 +1,6 @@
 import asyncio
 from typing import Optional
-from game_session import GameSession
+from .game_session import GameSession
 
 
 class GameLoop:

@@ -34,9 +34,9 @@ def client():
     mock_loop.last_state = FAKE_STATE
     mock_loop.submit_action = AsyncMock()
 
-    with patch("main.session", mock_session), patch("main.game_loop", mock_loop):
+    with patch("tribes_py.web.main.session", mock_session), patch("tribes_py.web.main.game_loop", mock_loop):
         from fastapi.testclient import TestClient
-        from main import app
+        from tribes_py.web.main import app
         yield TestClient(app)
 
 

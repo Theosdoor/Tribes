@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from pathlib import Path
 from typing import Optional
 
 from fastapi import FastAPI, HTTPException, WebSocket, WebSocketDisconnect
@@ -7,11 +8,15 @@ from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 
-from game_loop import GameLoop
-from game_session import GameSession
+from .game_loop import GameLoop
+from .game_session import GameSession
+
+# Resolve static directory relative to this file
+_HERE = Path(__file__).resolve().parent
+_STATIC = _HERE / "static"
 
 app = FastAPI(title="Tribes")
-app.mount("/static", StaticFiles(directory="static"), name="static")
+app.mount("/static", StaticFiles(directory=str(_STATIC)), name="static")
 
 session: GameSession = GameSession()
 game_loop: Optional[GameLoop] = None
@@ -30,7 +35,7 @@ class ActionRequest(BaseModel):
 
 @app.get("/")
 async def index():
-    return FileResponse("static/index.html")
+    return FileResponse(_STATIC / "index.html")
 
 
 @app.post("/game/start")

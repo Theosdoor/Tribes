@@ -17,7 +17,7 @@ def mock_process():
 
 @pytest.mark.asyncio
 async def test_send_writes_json_and_parses_response(mock_process):
-    from game_session import GameSession
+    from tribes_py.web.game_session import GameSession
 
     expected = {"status": "ok", "state": {"tick": 0}}
     mock_process.stdout.readline = AsyncMock(
@@ -36,7 +36,7 @@ async def test_send_writes_json_and_parses_response(mock_process):
 
 @pytest.mark.asyncio
 async def test_stop_kills_process(mock_process):
-    from game_session import GameSession
+    from tribes_py.web.game_session import GameSession
 
     session = GameSession()
     session._process = mock_process
