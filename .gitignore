@@ -16,7 +16,7 @@ map/
 map_elites_*
 
 
-
+.claude/
 *.err
 
 # Byte-compiled / optimized / DLL files
