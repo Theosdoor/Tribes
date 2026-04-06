@@ -1,2 +1,101 @@
 <!DOCTYPE html>
-<html><body><h1>Tribes — frontend coming soon</h1></body></html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TRIBES :: Tactical Command</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Outfit:wght@300;500;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Setup View -->
+    <div id="setup-view" class="view active">
+        <div class="setup-container">
+            <header class="setup-header">
+                <h1 class="title">TRIBES</h1>
+                <div class="subtitle">Tactical Command Interface</div>
+            </header>
+
+            <div class="setup-content">
+                <div class="config-panel">
+                    <div class="section-header">DEPLOYMENT CONFIGURATION</div>
+                    
+                    <div id="players-container" class="players-grid">
+                        <!-- Player rows added dynamically -->
+                    </div>
+
+                    <button id="add-player-btn" class="btn-secondary">+ ADD COMBATANT</button>
+
+                    <div class="game-mode-section">
+                        <label class="input-label">MISSION OBJECTIVE</label>
+                        <select id="game-mode" class="select-input">
+                            <option value="Capitals">Capitals Elimination</option>
+                            <option value="Score">Score Superiority</option>
+                        </select>
+                    </div>
+
+                    <button id="start-game-btn" class="btn-primary">INITIATE ENGAGEMENT</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Game View -->
+    <div id="game-view" class="view">
+        <div class="game-container">
+            <!-- Status Bar -->
+            <div class="status-bar">
+                <div class="status-left">
+                    <span class="status-label">TURN</span>
+                    <span id="turn-display" class="status-value">0</span>
+                </div>
+                <div class="status-center" id="status-message">
+                    <span class="status-indicator"></span>
+                    <span id="status-text">AWAITING ORDERS</span>
+                </div>
+                <div class="status-right">
+                    <span class="status-label">MODE</span>
+                    <span id="mode-display" class="status-value">CAPITALS</span>
+                </div>
+            </div>
+
+            <!-- Main Game Area -->
+            <div class="game-content">
+                <!-- Left Panel: Tribes Info -->
+                <div class="side-panel left-panel">
+                    <div class="panel-header">COMBATANTS</div>
+                    <div id="tribes-list" class="tribes-container">
+                        <!-- Tribe cards added dynamically -->
+                    </div>
+                </div>
+
+                <!-- Center: Canvas Board -->
+                <div class="canvas-container">
+                    <canvas id="game-board"></canvas>
+                </div>
+
+                <!-- Right Panel: Actions -->
+                <div class="side-panel right-panel">
+                    <div class="panel-header">TACTICAL OPTIONS</div>
+                    <div id="actions-container" class="actions-list">
+                        <div class="no-actions">NO ACTIONS AVAILABLE</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Game Over Overlay -->
+        <div id="game-over-overlay" class="overlay">
+            <div class="overlay-content">
+                <div class="overlay-status">ENGAGEMENT CONCLUDED</div>
+                <div id="winner-display" class="overlay-winner"></div>
+                <button id="new-game-btn" class="btn-primary">NEW DEPLOYMENT</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="/static/game.js"></script>
+</body>
+</html>
