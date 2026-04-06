@@ -1,7 +1,7 @@
 [project]
 name = "tribes"
 version = "0.1.0"
-description = "Tribes game web interface"
+description = "Tribes game with web interface"
 readme = "README.md"
 requires-python = ">=3.10"
 dependencies = [

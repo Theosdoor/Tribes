@@ -11,12 +11,15 @@ from pydantic import BaseModel
 from .game_loop import GameLoop
 from .game_session import GameSession
 
-# Resolve static directory relative to this file
+# Resolve directories relative to this file
 _HERE = Path(__file__).resolve().parent
 _STATIC = _HERE / "static"
+_ROOT = _HERE.parent.parent  # Up from tribes_py/web/ to repo root
+_IMG = _ROOT / "img"
 
 app = FastAPI(title="Tribes")
 app.mount("/static", StaticFiles(directory=str(_STATIC)), name="static")
+app.mount("/img", StaticFiles(directory=str(_IMG)), name="img")
 
 session: GameSession = GameSession()
 game_loop: Optional[GameLoop] = None
