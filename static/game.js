@@ -3,14 +3,25 @@
 // ============================================
 
 const PLAYER_TYPES = ['HUMAN', 'RANDOM', 'MCTS', 'RHEA', 'OSLA', 'MC', 'OEP', 'EMCTS', 'PORTFOLIO_MCTS'];
-const TRIBES = ['Xin Xi', 'Imperius', 'Bardur', 'Oumaji', 'Zebasi', 'Hoodrick', 'Luxidoor', 'Vengir', 'Elyrion', 'Polaris', 'Kickoo'];
+// Names must match Java Types.TRIBE getName() or name() after normalization
+const TRIBES = ['Xin-Xi', 'Imperius', 'Bardur', 'Oumaji', 'Kickoo', 'Hoodrick', 'Luxidoor', 'Vengir', 'Zebasi', 'Ai-Mo', 'Quetzali', 'Yadakk'];
 
 const TERRAIN_COLORS = {
-    'PLAIN': '#c8b96e',
-    'MOUNTAIN': '#8a8a8a',
-    'FOREST': '#2d6a2d',
-    'OCEAN': '#1a6b8a',
-    'SHALLOW_WATER': '#4da6c8'
+    'PLAIN':        '#c8b96e',
+    'MOUNTAIN':     '#8a8a8a',
+    'FOREST':       '#2d6a2d',
+    'DEEP_WATER':   '#1a6b8a',
+    'SHALLOW_WATER':'#4da6c8',
+    'VILLAGE':      '#d4a96e',
+    'CITY':         '#c8a060',
+    'FOG':          '#333333',
+};
+
+const UNIT_LABELS = {
+    'WARRIOR':     'Wa', 'ARCHER':    'Ar', 'RIDER':     'Ri',
+    'SWORDMAN':    'Sw', 'CATAPULT':  'Ca', 'KNIGHT':    'Kn',
+    'DEFENDER':    'De', 'MINDBENDER':'Mb', 'BOAT':      'Bo',
+    'SHIP':        'Sh', 'BATTLESHIP':'Bs', 'SUPERUNIT': 'Su',
 };
 
 const TRIBE_COLORS = ['#2ecc71', '#3498db', '#e74c3c', '#f39c12'];
@@ -288,10 +299,27 @@ function drawUnit(ctx, x, y, unit, tileSize) {
     const radius = 14;
 
     // Unit circle
-    ctx.fillStyle = TRIBE_COLORS[unit.tribe_id];
+    ctx.fillStyle = TRIBE_COLORS[unit.tribe_id] || '#888';
     ctx.beginPath();
     ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
     ctx.fill();
+
+    // Veteran ring
+    if (unit.is_veteran) {
+        ctx.strokeStyle = '#ffd700';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
+        ctx.stroke();
+    }
+
+    // Unit type label
+    const label = UNIT_LABELS[unit.type] || unit.type.slice(0, 2);
+    ctx.fillStyle = '#ffffff';
+    ctx.font = 'bold 9px monospace';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(label, centerX, centerY);
 
     // HP bar
     const barWidth = 30;

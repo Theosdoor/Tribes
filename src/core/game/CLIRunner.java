@@ -212,8 +212,13 @@ public class CLIRunner {
     }
 
     private Types.TRIBE parseTribe(String name) throws Exception {
+        // Normalize: lowercase and strip spaces, hyphens, underscores
+        // so "Xin Xi", "Xin-Xi", and "XIN_XI" all resolve correctly
+        String norm = name.toLowerCase().replaceAll("[\\s\\-_]", "");
         for (Types.TRIBE t : Types.TRIBE.values()) {
-            if (t.toString().equalsIgnoreCase(name) || t.name().equalsIgnoreCase(name))
+            String enumNorm    = t.name().toLowerCase().replaceAll("[\\s\\-_]", "");
+            String displayNorm = t.getName().toLowerCase().replaceAll("[\\s\\-_]", "");
+            if (enumNorm.equals(norm) || displayNorm.equals(norm))
                 return t;
         }
         throw new Exception("Unknown tribe: " + name);

@@ -27,7 +27,8 @@ class GameSession:
             {"cmd": "init", "players": players, "tribes": tribes,
              "mode": mode, "seed": seed}
         )
-        self.is_running = True
+        if response.get("status") in ("ok", "game_over"):
+            self.is_running = True
         return response
 
     async def _send(self, cmd: dict) -> dict:
