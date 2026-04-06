@@ -30,8 +30,9 @@ const UNIT_TYPES = [
     'defender', 'mind_bender', 'boat', 'ship', 'battleship', 'superunit'
 ];
 
-// Number of tribes (0-11)
-const NUM_TRIBES = 12;
+// Number of tribes with unit images (only 0-3 have images for most units)
+// Warrior has all 12, but others only have 4
+const NUM_TRIBES_WITH_IMAGES = 4;
 
 // Building image paths
 const BUILDING_IMAGES = {
@@ -86,9 +87,10 @@ function getAllImagePaths() {
     // Resource images
     Object.values(RESOURCE_IMAGES).forEach(path => paths.push(path));
 
-    // Unit images (all types × all tribes × normal/exhausted)
+    // Unit images (all types × available tribes × normal/exhausted)
+    // Most units only have images for tribes 0-3
     UNIT_TYPES.forEach(unitType => {
-        for (let tribeId = 0; tribeId < NUM_TRIBES; tribeId++) {
+        for (let tribeId = 0; tribeId < NUM_TRIBES_WITH_IMAGES; tribeId++) {
             paths.push(getUnitImagePath(unitType, tribeId, false));
             paths.push(getUnitImagePath(unitType, tribeId, true));
         }
@@ -175,7 +177,7 @@ function hideLoadingProgress() {
 
 /**
  * Preload all game images
- * @returns {Promise} Resolves when all images are loaded
+ * @returns {Promise} Resolves when all images are loaded (or timeout)
  */
 function preloadImages() {
     return new Promise((resolve, reject) => {
@@ -183,12 +185,31 @@ function preloadImages() {
         let loaded = 0;
         let failed = 0;
         const failedPaths = [];
+        let resolved = false;
+
+        const finish = () => {
+            if (resolved) return;
+            resolved = true;
+            imagesLoaded = true;
+            hideLoadingProgress();
+            if (failedPaths.length > 0) {
+                console.warn(`${failedPaths.length} images failed to load`);
+            }
+            resolve();
+        };
 
         if (allPaths.length === 0) {
-            imagesLoaded = true;
-            resolve();
+            finish();
             return;
         }
+
+        // Timeout after 30 seconds
+        const timeout = setTimeout(() => {
+            if (!resolved) {
+                console.warn('Image loading timed out');
+                finish();
+            }
+        }, 30000);
 
         showLoadingProgress(0, allPaths.length);
 
@@ -201,26 +222,19 @@ function preloadImages() {
                 showLoadingProgress(loaded + failed, allPaths.length);
                 
                 if (loaded + failed === allPaths.length) {
-                    imagesLoaded = true;
-                    hideLoadingProgress();
-                    if (failedPaths.length > 0) {
-                        console.warn('Some images failed to load:', failedPaths);
-                    }
-                    resolve();
+                    clearTimeout(timeout);
+                    finish();
                 }
             };
 
             img.onerror = () => {
                 failed++;
                 failedPaths.push(path);
-                console.warn(`Failed to load image: ${path}`);
                 showLoadingProgress(loaded + failed, allPaths.length);
                 
                 if (loaded + failed === allPaths.length) {
-                    imagesLoaded = true;
-                    hideLoadingProgress();
-                    // Resolve anyway - we'll fall back to colored shapes for missing images
-                    resolve();
+                    clearTimeout(timeout);
+                    finish();
                 }
             };
 
