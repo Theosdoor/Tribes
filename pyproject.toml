@@ -1,7 +1,13 @@
 [project]
 name = "tribes"
 version = "0.1.0"
-description = "Add your description here"
+description = "Tribes game web interface"
 readme = "README.md"
 requires-python = ">=3.10"
-dependencies = []
+dependencies = [
+    "fastapi",
+    "uvicorn[standard]",
+    "httpx",
+    "pytest",
+    "pytest-asyncio",
+]
