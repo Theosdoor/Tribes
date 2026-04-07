@@ -178,7 +178,7 @@ function activateBuildRoad() {
     unitActionMap = new Map();
     currentActions.filter(a => a.type === 'BUILD_ROAD')
         .forEach(a => unitActionMap.set(`${a.target_x},${a.target_y}`, a));
-    if (currentState) renderBoard(currentState.board, currentState.tribes);
+    if (currentState) renderBoard(currentState.board);
 }
 
 // ── Action log ────────────────────────────────────────────────────────────────

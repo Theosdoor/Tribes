@@ -512,7 +512,7 @@ function renderGameState(state) {
         appendActionLog(state.last_action, isAI);
     }
     if (state.leveling_up) refreshActions().then(showLevelUpDialog);
-    renderBoard(state.board, state.tribes);
+    renderBoard(state.board);
 }
 
 
@@ -567,6 +567,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     document.getElementById('left-panel-close').addEventListener('click', () => {
         clearSelection();
         renderLeftPanel('tribes');
-        if (currentState) renderBoard(currentState.board, currentState.tribes);
+        if (currentState) renderBoard(currentState.board);
     });
 });

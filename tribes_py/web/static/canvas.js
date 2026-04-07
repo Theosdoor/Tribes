@@ -24,7 +24,7 @@ const HIGHLIGHT_COLORS = {
 
 let pendingAnimation = null; // {x, y, color, expiresAt}
 
-function renderBoard(board, tribes) {
+function renderBoard(board) {
     const canvas = document.getElementById('game-board');
     const ctx    = canvas.getContext('2d');
     const size   = board.length;
@@ -59,7 +59,7 @@ function renderBoard(board, tribes) {
     if (pendingAnimation && Date.now() < pendingAnimation.expiresAt) {
         ctx.fillStyle = pendingAnimation.color;
         ctx.fillRect(pendingAnimation.x * tileSize, pendingAnimation.y * tileSize, tileSize, tileSize);
-        requestAnimationFrame(() => renderBoard(board, tribes));
+        requestAnimationFrame(() => { if (currentState) renderBoard(currentState.board); });
     }
 
     ctx.restore();
@@ -156,7 +156,7 @@ function initCanvasEvents() {
             isDragging = true;
             panOffset  = { x: panOffset.x + dx, y: panOffset.y + dy };
             dragStart  = { x: e.clientX, y: e.clientY };
-            if (currentState) renderBoard(currentState.board, currentState.tribes);
+            if (currentState) renderBoard(currentState.board);
         }
     });
 
@@ -170,7 +170,7 @@ function initCanvasEvents() {
     canvas.addEventListener('wheel', e => {
         e.preventDefault();
         tileSize = Math.max(TILE_SIZE_MIN, Math.min(TILE_SIZE_MAX, tileSize + (e.deltaY > 0 ? -4 : 4)));
-        if (currentState) renderBoard(currentState.board, currentState.tribes);
+        if (currentState) renderBoard(currentState.board);
     }, { passive: false });
 }
 
@@ -194,7 +194,7 @@ function selectTile(x, y) {
     selectedTile = { x, y };
     buildActionMap(x, y);
     renderLeftPanel('tile', { x, y, tile: currentState.board[y][x] });
-    renderBoard(currentState.board, currentState.tribes);
+    renderBoard(currentState.board);
 }
 
 // ── Animations ────────────────────────────────────────────────────────────────
