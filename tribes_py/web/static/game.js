@@ -325,7 +325,7 @@ const UNIT_LABELS = {
 const TRIBE_COLORS = ['#2ecc71', '#3498db', '#e74c3c', '#f39c12'];
 
 let ws = null;
-let currentState = null;
+// currentState and currentActions are declared in state.js (loaded first)
 let reconnectAttempts = 0;
 const MAX_RECONNECT = 1;
 
