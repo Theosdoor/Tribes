@@ -507,6 +507,11 @@ function renderGameState(state) {
     updateTribeActionButtons();
 
     // Render board
+    if (state.last_action) {
+        const isAI = !state.tribes[state.active_tribe].is_human;
+        appendActionLog(state.last_action, isAI);
+    }
+    if (state.leveling_up) refreshActions().then(showLevelUpDialog);
     renderBoard(state.board, state.tribes);
 }
 
@@ -517,51 +522,6 @@ function renderGameState(state) {
 // ============================================
 // ACTIONS
 // ============================================
-
-async function fetchActions() {
-    try {
-        const response = await fetch('/game/actions');
-        const data = await response.json();
-
-        if (data.actions) {
-            displayActions(data.actions);
-        }
-    } catch (error) {
-        console.error('Error fetching actions:', error);
-    }
-}
-
-function displayActions(actions) {
-    const container = document.getElementById('actions-container');
-    container.innerHTML = '';
-
-    actions.forEach(action => {
-        const btn = document.createElement('button');
-        btn.className = 'action-btn';
-        btn.textContent = action.description;
-        btn.onclick = () => submitAction(action.id);
-        container.appendChild(btn);
-    });
-}
-
-
-
-async function submitAction(actionId) {
-    // Disable all buttons
-    document.querySelectorAll('.action-btn').forEach(btn => {
-        btn.disabled = true;
-    });
-
-    try {
-        await fetch('/game/action', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ action_id: actionId })
-        });
-    } catch (error) {
-        console.error('Error submitting action:', error);
-    }
-}
 
 // ============================================
 // GAME OVER
@@ -601,6 +561,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     
     initSetup();
     initCanvasEvents();
+    initGameControls();
 
     // Left panel close handler
     document.getElementById('left-panel-close').addEventListener('click', () => {
