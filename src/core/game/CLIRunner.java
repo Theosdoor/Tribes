@@ -4,7 +4,16 @@ import core.Constants;
 import core.TechnologyTree;
 import core.Types;
 import core.actions.Action;
+import core.actions.cityactions.CityAction;
+import core.actions.unitactions.Attack;
+import core.actions.unitactions.Convert;
+import core.actions.unitactions.Move;
+import core.actions.unitactions.UnitAction;
+import core.actions.tribeactions.BuildRoad;
+import core.actions.tribeactions.DeclareWar;
 import core.actions.tribeactions.EndTurn;
+import core.actions.tribeactions.ResearchTech;
+import core.actions.tribeactions.SendStars;
 import core.actors.City;
 import core.actors.Tribe;
 import core.actors.units.Unit;
@@ -322,6 +331,101 @@ public class CLIRunner {
             aj.put("id",          i);
             aj.put("type",        a.getActionType().toString());
             aj.put("description", a.toString());
+
+            // Unit origin position (all unit actions)
+            if (a instanceof UnitAction) {
+                Unit unit = (Unit) gs.getActor(((UnitAction) a).getUnitId());
+                if (unit != null) {
+                    aj.put("unit_x", unit.getPosition().x);
+                    aj.put("unit_y", unit.getPosition().y);
+                }
+            }
+
+            // Target position by action type
+            switch (a.getActionType()) {
+                case MOVE: {
+                    Vector2d dest = ((Move) a).getDestination();
+                    aj.put("target_x", dest.x);
+                    aj.put("target_y", dest.y);
+                    break;
+                }
+                case ATTACK: {
+                    Unit target = (Unit) gs.getActor(((Attack) a).getTargetId());
+                    if (target != null) {
+                        aj.put("target_x", target.getPosition().x);
+                        aj.put("target_y", target.getPosition().y);
+                    }
+                    break;
+                }
+                case CONVERT: {
+                    Unit target = (Unit) gs.getActor(((Convert) a).getTargetId());
+                    if (target != null) {
+                        aj.put("target_x", target.getPosition().x);
+                        aj.put("target_y", target.getPosition().y);
+                    }
+                    break;
+                }
+                case HEAL_OTHERS:
+                case CAPTURE:
+                case EXAMINE:
+                case RECOVER:
+                case MAKE_VETERAN:
+                case DISBAND:
+                case UPGRADE_BOAT:
+                case UPGRADE_SHIP: {
+                    // target tile is the unit's own position
+                    if (a instanceof UnitAction) {
+                        Unit unit = (Unit) gs.getActor(((UnitAction) a).getUnitId());
+                        if (unit != null) {
+                            aj.put("target_x", unit.getPosition().x);
+                            aj.put("target_y", unit.getPosition().y);
+                        }
+                    }
+                    break;
+                }
+                case SPAWN:
+                case BUILD:
+                case RESOURCE_GATHERING:
+                case BURN_FOREST:
+                case CLEAR_FOREST:
+                case GROW_FOREST:
+                case DESTROY: {
+                    CityAction ca = (CityAction) a;
+                    aj.put("city_id", ca.getCityId());
+                    Vector2d tp = ca.getTargetPos();
+                    if (tp != null) {
+                        aj.put("target_x", tp.x);
+                        aj.put("target_y", tp.y);
+                    }
+                    break;
+                }
+                case LEVEL_UP: {
+                    aj.put("city_id", ((CityAction) a).getCityId());
+                    break;
+                }
+                case RESEARCH_TECH: {
+                    aj.put("tech", ((ResearchTech) a).getTech().toString());
+                    break;
+                }
+                case SEND_STARS: {
+                    SendStars ss = (SendStars) a;
+                    aj.put("target_tribe_id", ss.getTargetID());
+                    aj.put("stars",           ss.getNumStars());
+                    break;
+                }
+                case DECLARE_WAR: {
+                    aj.put("target_tribe_id", ((DeclareWar) a).getTargetID());
+                    break;
+                }
+                case BUILD_ROAD: {
+                    Vector2d pos = ((BuildRoad) a).getPosition();
+                    aj.put("target_x", pos.x);
+                    aj.put("target_y", pos.y);
+                    break;
+                }
+                default:
+                    break;
+            }
             arr.put(aj);
         }
         return arr;
