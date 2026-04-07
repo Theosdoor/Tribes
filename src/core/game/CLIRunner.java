@@ -5,6 +5,7 @@ import core.TechnologyTree;
 import core.Types;
 import core.actions.Action;
 import core.actions.tribeactions.EndTurn;
+import core.actors.City;
 import core.actors.Tribe;
 import core.actors.units.Unit;
 import org.json.JSONArray;
@@ -35,6 +36,7 @@ public class CLIRunner {
     private GameState gs;
     private Agent[] agents;    // null for human slots
     private boolean[] isHuman;
+    private String lastActionDesc = null;
     private int numPlayers;
 
     public static void main(String[] args) {
@@ -83,6 +85,8 @@ public class CLIRunner {
         state.put("game_mode", gs.getGameMode().toString());
         state.put("board", serializeBoard());
         state.put("tribes", serializeTribes());
+        state.put("leveling_up", gs.isLevelingUp());
+        state.put("last_action", lastActionDesc != null ? lastActionDesc : JSONObject.NULL);
         return state;
     }
 
@@ -101,7 +105,18 @@ public class CLIRunner {
                 tile.put("building", bld  != null ? bld.toString()  : JSONObject.NULL);
                 Unit unit = board.getUnitAt(x, y);
                 tile.put("unit",     unit != null ? serializeUnit(unit) : JSONObject.NULL);
-                tile.put("city_id",  board.getCityIdAt(x, y));
+                int cityId = board.getCityIdAt(x, y);
+                tile.put("city_id", cityId);
+                if (cityId >= 0) {
+                    City c = (City) board.getActor(cityId);
+                    if (c != null) {
+                        JSONObject cityJson = new JSONObject();
+                        cityJson.put("is_capital",   c.isCapital());
+                        cityJson.put("production",   c.getProduction());
+                        cityJson.put("points_worth", c.getPointsWorth());
+                        tile.put("city", cityJson);
+                    }
+                }
                 row.put(tile);
             }
             rows.put(row);
@@ -116,11 +131,17 @@ public class CLIRunner {
         u.put("hp",         unit.getCurrentHP());
         u.put("max_hp",     unit.getMaxHP());
         Vector2d pos = unit.getPosition();
-        u.put("x", pos.x);
-        u.put("y", pos.y);
-        u.put("is_veteran",  unit.isVeteran());
-        u.put("can_move",    unit.canMove());
-        u.put("can_attack",  unit.canAttack());
+        u.put("x",          pos.x);
+        u.put("y",          pos.y);
+        u.put("is_veteran", unit.isVeteran());
+        u.put("can_move",   unit.canMove());
+        u.put("can_attack", unit.canAttack());
+        u.put("atk",        unit.ATK);
+        u.put("def",        unit.DEF);
+        u.put("mov",        unit.MOV);
+        u.put("range",      unit.RANGE);
+        u.put("kills",      unit.getKills());
+        u.put("status",     unit.getStatus().toString());
         return u;
     }
 
@@ -130,14 +151,22 @@ public class CLIRunner {
         for (int i = 0; i < tribes.length; i++) {
             Tribe t = tribes[i];
             JSONObject tj = new JSONObject();
-            tj.put("id",        i);
-            tj.put("name",      t.getType().toString());
-            tj.put("stars",     t.getStars());
-            tj.put("num_cities", t.getNumCities());
-            tj.put("is_human",  isHuman[i]);
-            tj.put("winner",    t.getWinner().toString());
-            tj.put("score",     t.getScore());
-            tj.put("num_techs", countResearchedTechs(t));
+            tj.put("id",             i);
+            tj.put("name",           t.getType().toString());
+            tj.put("stars",          t.getStars());
+            tj.put("num_cities",     t.getNumCities());
+            tj.put("is_human",       isHuman[i]);
+            tj.put("winner",         t.getWinner().toString());
+            tj.put("score",          t.getScore());
+            tj.put("num_techs",      countResearchedTechs(t));
+            tj.put("max_production", t.getMaxProduction(gs));
+            tj.put("agent_type",     isHuman[i] ? "HUMAN" : agents[i].getClass().getSimpleName());
+            TechnologyTree tt = t.getTechTree();
+            JSONArray techArr = new JSONArray();
+            for (Types.TECHNOLOGY tech : Types.TECHNOLOGY.values()) {
+                if (tt.isResearched(tech)) techArr.put(tech.toString());
+            }
+            tj.put("techs", techArr);
             arr.put(tj);
         }
         return arr;
@@ -324,6 +353,7 @@ public class CLIRunner {
     }
 
     private JSONObject applyAndRespond(Action action) {
+        lastActionDesc = action.toString();
         int beforeId = gs.getActiveTribeID();
         gs.advance(action, true);
         // advance() handles: EndTurn → endTurn() → next tribe → initTurn() → computePlayerActions()
