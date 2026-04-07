@@ -495,50 +495,22 @@ function renderGameState(state) {
     } else if (activeTribe.is_human) {
         statusText.textContent = 'YOUR TURN';
         statusIndicator.style.background = '#2ecc71';
-        fetchActions();
+        refreshActions().then(() => { updateTribeActionButtons(); });
     } else {
         statusText.textContent = 'AI PROCESSING...';
         statusIndicator.style.background = '#f39c12';
-        clearActions();
+        currentActions = [];
     }
 
-    // Render tribes
-    renderTribes(state.tribes, state.active_tribe);
+    // Render left panel (tribes list unless a tile is selected)
+    if (!selectedTile) renderLeftPanel('tribes');
+    updateTribeActionButtons();
 
     // Render board
     renderBoard(state.board, state.tribes);
 }
 
-function renderTribes(tribes, activeIdx) {
-    const container = document.getElementById('tribes-list');
-    container.innerHTML = '';
 
-    tribes.forEach((tribe, idx) => {
-        const card = document.createElement('div');
-        card.className = `tribe-card ${idx === activeIdx ? 'active' : ''}`;
-        card.style.borderLeftColor = TRIBE_COLORS[idx];
-
-        card.innerHTML = `
-            <div class="tribe-name">${tribe.name}</div>
-            <div class="tribe-stats">
-                <div class="tribe-stat">
-                    ⭐ <span class="tribe-stat-value">${tribe.stars}</span>
-                </div>
-                <div class="tribe-stat">
-                    🏙 <span class="tribe-stat-value">${tribe.num_cities}</span>
-                </div>
-                <div class="tribe-stat">
-                    🔬 <span class="tribe-stat-value">${tribe.num_techs}</span>
-                </div>
-                <div class="tribe-stat">
-                    📊 <span class="tribe-stat-value">${tribe.score}</span>
-                </div>
-            </div>
-        `;
-
-        container.appendChild(card);
-    });
-}
 
 // NOTE: renderBoard, drawTile, drawTileLabel, drawUnit now live in canvas.js
 
@@ -572,10 +544,7 @@ function displayActions(actions) {
     });
 }
 
-function clearActions() {
-    const container = document.getElementById('actions-container');
-    container.innerHTML = '<div class="no-actions">AWAITING AI MOVE</div>';
-}
+
 
 async function submitAction(actionId) {
     // Disable all buttons
@@ -632,4 +601,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     
     initSetup();
     initCanvasEvents();
+
+    // Left panel close handler
+    document.getElementById('left-panel-close').addEventListener('click', () => {
+        clearSelection();
+        renderLeftPanel('tribes');
+        if (currentState) renderBoard(currentState.board, currentState.tribes);
+    });
 });
