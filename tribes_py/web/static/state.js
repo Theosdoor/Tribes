@@ -50,8 +50,7 @@ function buildActionMap(x, y) {
  * Submit action by id. Logs it, clears selection, posts to server.
  * @param {number} actionId  @param {string} description  @param {boolean} [isAI=false]
  */
-async function submitAction(actionId, description, isAI = false) {
-    appendActionLog(description, isAI);
+async function submitAction(actionId) {
     clearSelection();
     try {
         await fetch('/game/action', {
