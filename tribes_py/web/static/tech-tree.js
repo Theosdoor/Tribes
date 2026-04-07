@@ -60,7 +60,7 @@ const TECH_UNLOCKS = {
 };
 
 /**
- * Returns Map<techName, 'researched'|'affordable'|'prereq'|'locked'>
+ * Returns Map<techName, 'researched'|'affordable'|'unlocked'|'locked'>
  * 'affordable' = has a RESEARCH_TECH action in currentActions (backend confirms prereq + stars)
  */
 function computeTechStatuses() {
@@ -75,7 +75,7 @@ function computeTechStatuses() {
         let status;
         if      (researched.has(name))    status = 'researched';
         else if (researchable.has(name))  status = 'affordable';
-        else if (!node.parent || researched.has(node.parent)) status = 'prereq';
+        else if (!node.parent || researched.has(node.parent)) status = 'unlocked';
         else    status = 'locked';
         return [name, status];
     }));
@@ -133,7 +133,10 @@ function renderTechDetail(techName, statuses, numCities) {
 
     const status  = statuses.get(techName) || 'locked';
     const unlocks = TECH_UNLOCKS[techName] || [];
-    const cost    = 4 + TECH_TREE[techName].tier * numCities;
+    const rawCost = 4 + TECH_TREE[techName].tier * numCities;
+    const tribe = currentState ? currentState.tribes[currentState.active_tribe] : null;
+    const hasPhilosophy = tribe && (tribe.techs || []).includes('PHILOSOPHY');
+    const cost = hasPhilosophy ? Math.floor(rawCost * 0.2) : rawCost;
 
     const nameEl = document.createElement('div');
     nameEl.className = 'tech-detail-name';

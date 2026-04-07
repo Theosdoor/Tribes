@@ -652,7 +652,7 @@ body::before {
 .tech-node:hover   { opacity:0.8; }
 .tech-researched   { background:#04547a; color:#80ffff; border-color:#1a7fa0; }
 .tech-affordable   { background:#1a3a1a; color:#4eff71; border-color:#2a6a2a; }
-.tech-prereq       { background:#3a2a10; color:#ffa763; border-color:#6a4a1a; }
+.tech-unlocked     { background:#3a2a10; color:#ffa763; border-color:#6a4a1a; }
 .tech-locked       { background:#1a1a2a; color:#555;    border-color:#2a2a3a; }
 .tech-detail       { border-top:1px solid rgba(255,255,255,0.1); padding-top:12px; }
 .tech-detail-name  { font-size:13px; font-weight:700; color:#00ff88; text-transform:uppercase; margin-bottom:4px; }
