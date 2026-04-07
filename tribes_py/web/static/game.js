@@ -520,10 +520,6 @@ function renderGameState(state) {
 // NOTE: renderBoard, drawTile, drawTileLabel, drawUnit now live in canvas.js
 
 // ============================================
-// ACTIONS
-// ============================================
-
-// ============================================
 // GAME OVER
 // ============================================
 
