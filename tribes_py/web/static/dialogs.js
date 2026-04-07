@@ -69,7 +69,7 @@ function openSendStarsDialog() {
         const opt = document.createElement('option');
         opt.value = a.id;
         const tribe = currentState.tribes[tid];
-        opt.textContent = `${tribe ? tribe.name : tid} — ${a.stars} stars`;
+        opt.textContent = `${tribe ? tribe.name : tid} — ${a.stars != null ? a.stars : '?'} stars`;
         sel.appendChild(opt);
     });
 
@@ -144,7 +144,11 @@ function confirmQuit() {
     showDialog('END GAME', 'End this game and return to setup?', [
         { label: 'END GAME', className: 'btn-danger', onClick: async () => {
             closeDialog();
-            await fetch('/game/stop', { method: 'POST' });
+            try {
+                await fetch('/game/stop', { method: 'POST' });
+            } catch (err) {
+                console.error('Failed to stop game:', err);
+            }
             document.getElementById('game-over-overlay').classList.remove('active');
             switchToSetupView();
         }},
