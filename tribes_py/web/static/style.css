@@ -585,3 +585,86 @@ body::before {
 ::-webkit-scrollbar-thumb:hover {
     background: var(--border-active);
 }
+
+/* ── Game controls ───────────────────────────────────────────────── */
+.game-controls { display:flex; align-items:center; gap:6px; }
+.controls-divider { width:1px; height:20px; background:rgba(255,255,255,0.2); margin:0 4px; }
+.btn-control {
+    background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.15);
+    color:#ccc; border-radius:4px; padding:3px 8px; cursor:pointer; font-size:13px;
+    transition:background 0.15s;
+}
+.btn-control:hover { background:rgba(255,255,255,0.18); color:#fff; }
+.btn-control.btn-danger { border-color:rgba(231,76,60,0.4); color:#e74c3c; }
+.btn-control.btn-danger:hover { background:rgba(231,76,60,0.2); }
+
+/* ── Left panel ──────────────────────────────────────────────────── */
+.panel-close-btn { float:right; background:none; border:none; color:#aaa; cursor:pointer; font-size:14px; }
+.panel-close-btn:hover { color:#fff; }
+
+/* ── Tile info ───────────────────────────────────────────────────── */
+.tile-info { padding:8px; }
+.tile-info-header { font-weight:700; font-size:13px; margin-bottom:6px; color:#00ff88; text-transform:uppercase; }
+.tile-info-list { list-style:none; padding:0; margin:0 0 8px; font-size:12px; color:#ccc; }
+.tile-info-list li { padding:2px 0; }
+.tile-actions { padding:4px 8px; display:flex; flex-direction:column; gap:4px; }
+.tile-action-btn { font-size:11px; padding:4px 8px; }
+
+/* ── Tribe cards ─────────────────────────────────────────────────── */
+.tribe-agent { font-size:10px; color:#888; text-transform:uppercase; margin-bottom:2px; }
+
+/* ── Tribe tech list ─────────────────────────────────────────────── */
+.tribe-tech-list { list-style:none; padding:8px; margin:0; }
+.tribe-tech-item { font-size:12px; padding:3px 0; color:#aad4ff; text-transform:uppercase; }
+.tribe-tech-item.muted { color:#555; }
+
+/* ── Right panel ─────────────────────────────────────────────────── */
+.tribe-actions-section { display:flex; flex-direction:column; gap:4px; padding:8px; }
+.tribe-action-btn { font-size:12px; }
+.panel-header-sub { font-size:10px; margin-top:8px; }
+.action-log-list { list-style:none; padding:4px 8px; margin:0; overflow-y:auto; flex:1; font-size:11px; }
+.action-log-item { padding:2px 0; border-bottom:1px solid rgba(255,255,255,0.05); }
+.action-log-human { color:#b0d4ff; }
+.action-log-ai    { color:#666; }
+
+/* ── Modal ───────────────────────────────────────────────────────── */
+.modal-overlay {
+    position:fixed; inset:0; background:rgba(0,0,0,0.7);
+    display:flex; justify-content:center; align-items:center; z-index:10000;
+}
+.modal-box {
+    background:#0e1a2e; border:1px solid rgba(0,255,136,0.3); border-radius:8px;
+    padding:24px; max-width:640px; width:90%; max-height:80vh; overflow-y:auto; color:#ccc;
+}
+.modal-title { font-size:14px; font-weight:700; color:#00ff88; text-transform:uppercase; letter-spacing:2px; margin-bottom:16px; }
+.modal-body  { margin-bottom:16px; }
+.modal-buttons { display:flex; gap:8px; justify-content:flex-end; }
+.modal-btn { min-width:80px; }
+
+/* ── Tech tree ───────────────────────────────────────────────────── */
+.tech-modal-layout { display:flex; gap:12px; margin-bottom:12px; }
+.tech-tier-col     { flex:1; display:flex; flex-direction:column; gap:6px; }
+.tech-tier-label   { font-size:10px; color:#888; text-transform:uppercase; margin-bottom:4px; }
+.tech-node {
+    padding:6px 8px; border-radius:4px; font-size:11px; text-transform:uppercase;
+    cursor:pointer; transition:opacity 0.15s; border:1px solid transparent;
+}
+.tech-node:hover   { opacity:0.8; }
+.tech-researched   { background:#04547a; color:#80ffff; border-color:#1a7fa0; }
+.tech-affordable   { background:#1a3a1a; color:#4eff71; border-color:#2a6a2a; }
+.tech-prereq       { background:#3a2a10; color:#ffa763; border-color:#6a4a1a; }
+.tech-locked       { background:#1a1a2a; color:#555;    border-color:#2a2a3a; }
+.tech-detail       { border-top:1px solid rgba(255,255,255,0.1); padding-top:12px; }
+.tech-detail-name  { font-size:13px; font-weight:700; color:#00ff88; text-transform:uppercase; margin-bottom:4px; }
+.tech-detail-cost  { font-size:11px; color:#888; margin-bottom:8px; }
+.tech-detail-unlocks { font-size:12px; color:#ccc; padding-left:16px; margin-bottom:12px; }
+.tech-status-label { font-size:12px; padding:4px 8px; border-radius:4px; display:inline-block; text-transform:uppercase; }
+
+/* ── Danger button ───────────────────────────────────────────────── */
+.btn-danger {
+    background:rgba(231,76,60,0.15); border-color:rgba(231,76,60,0.4); color:#e74c3c;
+}
+.btn-danger:hover { background:rgba(231,76,60,0.3); }
+
+/* ── Select input ────────────────────────────────────────────────── */
+.select-input { background:#1a1f26; border:1px solid #2a3441; color:#e8edf2; padding:4px 8px; border-radius:4px; font-size:12px; width:100%; margin-top:4px; }
