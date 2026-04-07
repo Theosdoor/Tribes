@@ -511,7 +511,7 @@ function renderGameState(state) {
         const isAI = !state.tribes[state.active_tribe].is_human;
         appendActionLog(state.last_action, isAI);
     }
-    if (state.leveling_up) refreshActions().then(showLevelUpDialog);
+    if (state.leveling_up && activeTribe.is_human) refreshActions().then(showLevelUpDialog);
     renderBoard(state.board);
 }
 
