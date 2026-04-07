@@ -116,7 +116,7 @@ function appendTileInfo(container, tile, x, y) {
             `HP: ${u.hp} / ${u.max_hp}`,
             `ATK: ${u.atk != null ? u.atk : '?'}  DEF: ${u.def != null ? u.def : '?'}`,
             `MOV: ${u.mov != null ? u.mov : '?'}  RNG: ${u.range != null ? u.range : '?'}`,
-            u.is_veteran ? 'Veteran' : `Kills: ${Math.min(u.kills || 0, VETERAN_KILLS)} / ${VETERAN_KILLS}`,
+            u.is_veteran ? 'Veteran' : `Kills: ${Math.min(u.kills ?? 0, VETERAN_KILLS)} / ${VETERAN_KILLS}`,
             `Status: ${u.status || '?'}`,
         ].forEach(txt => {
             const li = document.createElement('li'); li.textContent = txt; list.appendChild(li);
