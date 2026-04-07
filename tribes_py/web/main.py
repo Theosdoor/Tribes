@@ -83,6 +83,38 @@ async def stop_game():
     return {"status": "ok"}
 
 
+@app.post("/game/pause")
+async def pause_game():
+    if not game_loop:
+        raise HTTPException(status_code=400, detail="No game running")
+    game_loop.pause()
+    return {"status": "ok"}
+
+
+@app.post("/game/resume")
+async def resume_game():
+    if not game_loop:
+        raise HTTPException(status_code=400, detail="No game running")
+    game_loop.resume()
+    return {"status": "ok"}
+
+
+@app.post("/game/play-turn")
+async def play_turn():
+    if not game_loop:
+        raise HTTPException(status_code=400, detail="No game running")
+    game_loop.play_turn()
+    return {"status": "ok"}
+
+
+@app.post("/game/play-tick")
+async def play_tick():
+    if not game_loop:
+        raise HTTPException(status_code=400, detail="No game running")
+    game_loop.play_tick()
+    return {"status": "ok"}
+
+
 @app.websocket("/ws")
 async def websocket_endpoint(ws: WebSocket):
     await ws.accept()
