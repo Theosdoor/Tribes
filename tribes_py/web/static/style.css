@@ -666,5 +666,5 @@ body::before {
 }
 .btn-danger:hover { background:rgba(231,76,60,0.3); }
 
-/* ── Select input ────────────────────────────────────────────────── */
-.select-input { background:#1a1f26; border:1px solid #2a3441; color:#e8edf2; padding:4px 8px; border-radius:4px; font-size:12px; width:100%; margin-top:4px; }
+/* ── Select input (dialog context) ──────────────────────────────── */
+.modal-box .select-input { width:100%; margin-top:4px; }
