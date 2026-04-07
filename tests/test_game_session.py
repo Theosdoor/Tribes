@@ -48,3 +48,36 @@ async def test_stop_kills_process(mock_process):
     mock_process.wait.assert_awaited_once()
     assert session._process is None
     assert not session.is_running
+
+
+@pytest.mark.asyncio
+async def test_pause_and_resume():
+    from tribes_py.web.game_loop import GameLoop
+    loop = GameLoop(MagicMock())
+    assert loop._paused.is_set()   # starts running
+    loop.pause()
+    assert not loop._paused.is_set()
+    loop.resume()
+    assert loop._paused.is_set()
+
+
+@pytest.mark.asyncio
+async def test_play_turn_sets_mode():
+    from tribes_py.web.game_loop import GameLoop
+    loop = GameLoop(MagicMock())
+    loop.last_state = {"tick": 0, "active_tribe": 1, "game_over": False}
+    loop.play_turn()
+    assert loop._play_mode == "turn"
+    assert loop._play_mode_start_tribe == 1
+    assert loop._paused.is_set()
+
+
+@pytest.mark.asyncio
+async def test_play_tick_sets_mode():
+    from tribes_py.web.game_loop import GameLoop
+    loop = GameLoop(MagicMock())
+    loop.last_state = {"tick": 3, "active_tribe": 0, "game_over": False}
+    loop.play_tick()
+    assert loop._play_mode == "tick"
+    assert loop._play_mode_start_tick == 3
+    assert loop._paused.is_set()
