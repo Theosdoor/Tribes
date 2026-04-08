@@ -6,6 +6,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 Tribes is a multi-player turn-based strategy game framework for AI research. It is a **pure Java project** (Java 8+) with no build tool (no Maven/Gradle). The only external dependency is `lib/json.jar`.
 
+Use british spelling.
+
 ## Building and Running
 
 **Compile** (from repo root, with `src/` as sources root):
