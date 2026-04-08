@@ -430,6 +430,7 @@ async function startGame() {
 function switchToGameView() {
     document.getElementById('setup-view').classList.remove('active');
     document.getElementById('game-view').classList.add('active');
+    clearActionLog();
 }
 
 function switchToSetupView() {

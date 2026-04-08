@@ -192,3 +192,9 @@ function appendActionLog(description, isAI) {
     list.insertBefore(li, list.firstChild);
     while (list.children.length > ACTION_LOG_MAX) list.removeChild(list.lastChild);
 }
+
+function clearActionLog() {
+    const list = document.getElementById('action-log');
+    if (!list) return;
+    list.textContent = '';
+}
