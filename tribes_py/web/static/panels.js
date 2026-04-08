@@ -70,8 +70,7 @@ function renderLeftPanel(mode, data) {
                 btn.className = 'action-btn tile-action-btn';
                 btn.textContent = a.description;
                 btn.addEventListener('click', () => {
-                    if (a.type === 'DISBAND') confirmDisband(() => submitAction(a.id, a.description));
-                    else submitAction(a.id, a.description);
+                    submitAction(a.id, a.description);
                 });
                 sec.appendChild(btn);
             });

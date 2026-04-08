@@ -184,7 +184,8 @@ function handleCanvasClick(e) {
 
     if (selectedTile && unitActionMap.has(`${tx},${ty}`)) {
         const a = unitActionMap.get(`${tx},${ty}`);
-        submitAction(a.id, a.description);
+        if (a.type === 'DISBAND') confirmDisband(() => submitAction(a.id, a.description));
+        else submitAction(a.id, a.description);
         return;
     }
     selectTile(tx, ty);
