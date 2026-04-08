@@ -53,7 +53,7 @@ const RESOURCE_IMAGES = {
     'FISH':   '/img/resource/fish2.png',
     'FRUIT':  '/img/resource/fruit2.png',
     'ANIMAL': '/img/resource/animal2.png',
-    'WHALE':  '/img/resource/whale2.png',
+    'WHALES': '/img/resource/whale2.png',
     'ORE':    '/img/resource/ore2.png',
     'CROPS':  '/img/resource/crops2.png',
     'RUINS':  '/img/resource/ruins2.png',
