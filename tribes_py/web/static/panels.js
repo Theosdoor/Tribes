@@ -182,13 +182,14 @@ function activateBuildRoad() {
 
 // ── Action log ────────────────────────────────────────────────────────────────
 
-function appendActionLog(description, isAI) {
+function appendActionLog(description, tribeIdx) {
     const list = document.getElementById('action-log');
     if (!list) return;
     const tick = currentState ? currentState.tick : '?';
     const li   = document.createElement('li');
-    li.className  = `action-log-item ${isAI ? 'action-log-ai' : 'action-log-human'}`;
+    li.className  = 'action-log-item';
     li.textContent = `[T${tick}] ${description}`;
+    li.style.borderLeftColor = TRIBE_COLORS[tribeIdx] || '#aaaaaa';
     list.insertBefore(li, list.firstChild);
     while (list.children.length > ACTION_LOG_MAX) list.removeChild(list.lastChild);
 }

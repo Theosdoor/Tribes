@@ -623,9 +623,7 @@ body::before {
 .tribe-action-btn { font-size:12px; }
 .panel-header-sub { font-size:10px; margin-top:8px; }
 .action-log-list { list-style:none; padding:4px 8px; margin:0; overflow-y:auto; flex:1; font-size:11px; }
-.action-log-item { padding:2px 0; border-bottom:1px solid rgba(255,255,255,0.05); }
-.action-log-human { color:#b0d4ff; }
-.action-log-ai    { color:#666; }
+.action-log-item { padding:2px 0; border-bottom:1px solid rgba(255,255,255,0.05); border-left:3px solid; }
 
 /* ── Modal ───────────────────────────────────────────────────────── */
 .modal-overlay {
